@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" lang="eng">
+<head th:fragment="dochead">
+    <title>Grimoire</title>
+</head>
+
+<body>
+
+<nav th:fragment="navigation">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="addMons">Add Monster</a></li>
+        <li><a href="addSighting">Add Sighting</a></li>
+        <li><a href="upload">Upload Spreadsheet</a> </li>
+    </ul>
+</nav>
+
+<footer th:fragment="footer">
+    <span th:text="${msg}"></span>
+</footer>
+
+</body>
+</html>

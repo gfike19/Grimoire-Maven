@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head th:replace="template :: dochead"></head>
+<header>
+    <h1>Sighting</h1>
+</header>
+<div th:replace="template :: navigation"></div>
+
+<body>
+    <form method="post">
+        <table>
+            <tr>
+                <td>Name</td> <td>Current Count</td> <td>Add Sighting</td>
+            </tr>
+            <tr th:each="mons: ${allMons}">
+                <td th:text="${mons.name}"></td>
+                <td th:text="${mons.count}"></td>
+                <td><input type="number" name="newCount" id="newCount" value="0"/>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="Add Sighting/s"/>
+    </form>
+
+</body>
+
+<footer th:replace="template :: footer"></footer>
+</html>
