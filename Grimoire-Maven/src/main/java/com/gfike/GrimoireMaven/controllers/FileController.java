@@ -3,6 +3,7 @@ package com.gfike.GrimoireMaven.controllers;
 import com.gfike.GrimoireMaven.models.Monster;
 import com.gfike.GrimoireMaven.models.data.MonsterDao;
 import com.gfike.GrimoireMaven.models.data.MonsterService;
+import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,35 +40,34 @@ public class FileController {
             return "upload";
         }
     @RequestMapping(value = "/upload",method = RequestMethod.POST)
-        public String mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile,
+        public void mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile,
     Model model) {
+         List<Monster> tempMonsList = new ArrayList<>();
+ XSSFWorkbook workbook = null;
+         try {
+             workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
+         }
+         catch(Exception e){
+             String msg = e.toString();
+             model.addAttribute("msg", msg);
+         }
 
-                List<Monster> tempMonsList = new ArrayList<>();
-        XSSFWorkbook workbook = null;
-                try {
-                    workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
-                }
-                catch(Exception e){
-                    String msg = e.toString();
-                    model.addAttribute("msg", msg);
-                        return "redirect:/";
-                }
+         XSSFSheet worksheet = workbook.getSheetAt(0);
 
-                XSSFSheet worksheet = workbook.getSheetAt(0);
+         for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+                 //Monster tempMons = new Monster();
 
-                for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
-                        Monster tempMons = new Monster();
+                 XSSFRow row = worksheet.getRow(i);
 
-                        XSSFRow row = worksheet.getRow(i);
+             String monsName = row.getCell(0).getStringCellValue();
+            System.out.println(monsName);
+//             tempMons.setCount((int) row.getCell(1).getNumericCellValue());
+//             tempMonsList.add(tempMons);
+         }
+//     for(Monster m : tempMonsList) {
+//         monsterDao.save(m);
+//     }
 
-                    tempMons.setId((int) row.getCell(0).getNumericCellValue());
-                    tempMons.setCount((int) row.getCell(1).getNumericCellValue());
-                    tempMonsList.add(tempMons);
-                }
-            for(Monster m : tempMonsList) {
-                monsterDao.save(m);
-            }
-            return "redirect:/";
         }
 
     @GetMapping("/download")
