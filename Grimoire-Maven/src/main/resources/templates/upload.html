@@ -9,13 +9,15 @@
 <body>
     <form th:action="@{/upload}" method="post" enctype="multipart/form-data">
 
-        <input type="file" th:name="file">
+        <input type="file" th:name="file" id="file"/>
 
         <input th:type="submit" value="Import" />
     </form>
+
     <form method="get" th:action="@{/download}">
         <button type="submit">Export</button>
     </form>
 </body>
+
 <footer th:replace="template :: footer"></footer>
 </html>

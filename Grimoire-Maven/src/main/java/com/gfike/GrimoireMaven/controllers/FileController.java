@@ -1,5 +1,6 @@
 package com.gfike.GrimoireMaven.controllers;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.gfike.GrimoireMaven.models.Monster;
 import com.gfike.GrimoireMaven.models.data.MonsterDao;
 import com.gfike.GrimoireMaven.models.data.MonsterService;
@@ -7,6 +8,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,36 +43,36 @@ public class FileController {
         public String uploadGet() {
             return "upload";
         }
-    @RequestMapping(value = "/upload",method = RequestMethod.POST)
-        public void mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile,
-    Model model) {
-         List<Monster> tempMonsList = new ArrayList<>();
- XSSFWorkbook workbook = null;
-         try {
-             workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
-         }
-         catch(Exception e){
-             String msg = e.toString();
-             model.addAttribute("msg", msg);
-         }
 
-         XSSFSheet worksheet = workbook.getSheetAt(0);
+    @PostMapping("/upload")
+    public void mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile)
+    throws IOException {
 
-         for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
-                 //Monster tempMons = new Monster();
+        List<Monster> tempMonsList = new ArrayList<>();
+        XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
+        XSSFSheet worksheet = workbook.getSheetAt(0);
 
-                 XSSFRow row = worksheet.getRow(i);
+        for(int i = 0 ; i < worksheet.getRow(0).getPhysicalNumberOfCells() ;i++) {
+            XSSFRow row = worksheet.getRow(i);
 
-             String monsName = row.getCell(0).getStringCellValue();
-            System.out.println(monsName);
-//             tempMons.setCount((int) row.getCell(1).getNumericCellValue());
-//             tempMonsList.add(tempMons);
-         }
-//     for(Monster m : tempMonsList) {
-//         monsterDao.save(m);
-//     }
-
+            boolean biped = (row.getCell(0).getBooleanCellValue());
+            int count = ((int)row.getCell(1).getNumericCellValue());
+            boolean fly = (row.getCell(2).getBooleanCellValue());
+            String name = (row.getCell(3).getStringCellValue());
+            boolean quad = row.getCell(4).getBooleanCellValue();
+            boolean swim = (row.getCell(5).getBooleanCellValue());
+            Monster tempMons = new Monster(name, biped, quad, swim, fly);
+            tempMonsList.add(tempMons);
         }
+
+        for(Monster m: tempMonsList){
+            monsterDao.save(m);
+        }
+
+
+
+    }
+
 
     @GetMapping("/download")
     public void exportCSV(HttpServletResponse response) throws Exception {

@@ -66,7 +66,8 @@ public class MonsterController {
             int count = Integer.parseInt(newCount.get(i));
             if (count > 0) {
                 Monster m = allMons.get(i);
-                m.setCount(count);
+                int currentCount = m.getCount();
+                m.setCount(currentCount + count);
                 monsterDao.save(m);
             }
         }
